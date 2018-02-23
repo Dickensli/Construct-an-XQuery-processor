@@ -7,7 +7,7 @@ import java.io.*;
 public class Main {
     public static void main (String[] args) throws IOException{
         //String XPath = "doc(\" test.txt \")/class/student[firstname == ../student/firstname]";
-        String XPath = "doc(\"j_caesar.xml\")//ACT[(./TITLE)==(./TITLE)]/*/SPEECH/../TITLE";
+        String XPath = "doc(\"test.txt\")/class/student/@rollno";
         ANTLRInputStream in = new ANTLRInputStream(XPath);
         XPathLexer lexer = new XPathLexer(in);
         CommonTokenStream tokens = new CommonTokenStream(lexer);

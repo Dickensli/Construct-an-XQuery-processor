@@ -1,6 +1,7 @@
 package XPath;
 
 import org.dom4j.Attribute;
+import org.dom4j.Element;
 import org.dom4j.Node;
 import org.dom4j.io.OutputFormat;
 import org.dom4j.io.XMLWriter;
@@ -11,20 +12,28 @@ import java.util.ArrayList;
 
 public class Output {
     String filename;
-    String XPath;
+    String inputStream;
 
     public Output(String filename, String XPath){
         this.filename = filename;
-        this.XPath = XPath;
+        this.inputStream = XPath;
     }
 
-    public void printAtt(ArrayList<Attribute> res) throws IOException{
-        System.out.println("Here is printAtt!");
+    public void printElement(XMLWriter writer, Element element) throws IOException{
+        //System.out.println("Here is printElement!");
+        try{
+            writer.write(element);
+        } catch (Exception e){
+            System.out.println("error in printNode");
+            throw e;
+        }
+    }
+
+    public void printAtt(XMLWriter writer, Attribute att) throws IOException{
+        //System.out.println("Here is printAtt!");
         try {
-            for (Attribute att : res) {
-                System.out.print("Attribute=");
-                System.out.println("\'" + att.getName() + "=" + att.getValue() + "\'");
-            }
+            System.out.print("Attribute=");
+            System.out.println("\'" + att.getName() + "=" + att.getValue() + "\'");
         }
         catch (Exception e){
             System.out.println("error in printAtt");
@@ -32,14 +41,11 @@ public class Output {
         }
     }
 
-    public void printText(ArrayList<String> res) throws IOException{
-        XMLWriter writer = new XMLWriter(new FileWriter(this.filename));
-        System.out.println("Here is printText!");
+    public void printText(String text) throws IOException{
+        //System.out.println("Here is printText!");
         try {
-            for (String text : res) {
-                System.out.print("Text=");
-                System.out.println(text);
-            }
+            System.out.print("Text=");
+            System.out.println(text);
         }
         catch (Exception e){
             System.out.println("error in printText");
@@ -47,44 +53,23 @@ public class Output {
         }
     }
 
-    public void printNode(ArrayList<Node> res) throws IOException{
-        System.out.println("Here is printNode!");
-        /*XMLWriter writer = new XMLWriter(new FileWriter(this.filename));
-        try{
-            for(Node node : res) {
-                writer.write(node);
-            }
-            writer.close();
-        } catch (Exception e){
-            System.out.println(e);
-        }*/
-        // Pretty print the document to System.out
-        XMLWriter writer;
-        OutputFormat format = OutputFormat.createPrettyPrint();
-        writer = new XMLWriter(System.out, format);
-        try{
-            for(Node node : res) {
-                writer.write(node);
-            }
-            writer.close();
-        } catch (Exception e){
-            System.out.println("error in printNode");
-            throw e;
-        }
-    }
-
     public void printXML(ArrayList res){
         try{
-            if(XPath.length() >= 6 && XPath.substring(XPath.length()-6).equals("text()"))
-                this.printText(res);
-            else if(XPath.matches(".*\\[^\\[]@.*"))
-                this.printAtt(res);
-            else
-                this.printNode(res);
+            OutputFormat format = OutputFormat.createPrettyPrint();
+            XMLWriter writer = new XMLWriter(System.out, format);
+            //writer = new XMLWriter(new FileWriter(this.filename));
+            for(Object obj : res){
+                if(obj instanceof String)
+                    this.printText((String)obj);
+                else if(obj instanceof Element)
+                    this.printElement(writer, (Element)obj);
+                else if(obj instanceof Attribute)
+                    this.printAtt(writer, (Attribute)obj);
+            }
+            writer.close();
         }
         catch(Exception e){
             System.out.println(e);
         }
-
     }
 }

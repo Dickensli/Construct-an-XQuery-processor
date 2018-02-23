@@ -9,7 +9,6 @@ ap : doc  '/' rp     #singleAP
    | doc  '//' rp    #doubleAP
    ;
 
-
 //relative path
 rp : tagName                   #tagRP
    | '*'                       #childrenRP

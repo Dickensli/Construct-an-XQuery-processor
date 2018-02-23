@@ -1,6 +1,5 @@
 grammar XPath;
 
-
 doc: 'doc("' filename '")';
 
 
