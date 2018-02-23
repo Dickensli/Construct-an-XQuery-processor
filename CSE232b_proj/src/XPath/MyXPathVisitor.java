@@ -8,12 +8,6 @@ import java.util.*;
 public class MyXPathVisitor extends XPathBaseVisitor<ArrayList>{
     public ArrayList<Node> curState= new ArrayList();
 
-    public MyXPathVisitor(){
-    }
-
-    public MyXPathVisitor(ArrayList<Node> list){
-        this.curState = list;
-    }
     @Override
     public ArrayList visitDoc(XPathParser.DocContext ctx) {
         this.curState = this.visit(ctx.filename());
@@ -106,7 +100,7 @@ public class MyXPathVisitor extends XPathBaseVisitor<ArrayList>{
 
     @Override
     public ArrayList visitCommaRP(XPathParser.CommaRPContext ctx) {
-        ArrayList<Node> prev = this.curState;
+        ArrayList<Node> prev = new ArrayList<Node>(this.curState);
         ArrayList<Node> first = this.visit(ctx.rp(0));
         this.curState = prev;
         ArrayList<Node> second = this.visit(ctx.rp(1));
@@ -114,10 +108,6 @@ public class MyXPathVisitor extends XPathBaseVisitor<ArrayList>{
         total.addAll(first);
         total.addAll(second);
         this.curState = total;
-//        this.curState = this.visit(ctx.rp(0));
-//        if (this.curState.isEmpty()){
-//            this.curState = this.visit(ctx.rp(1));
-//        }
         return this.curState;
     }
 
@@ -165,13 +155,12 @@ public class MyXPathVisitor extends XPathBaseVisitor<ArrayList>{
         for(int i=0 ; i < res.size() ; i++) {
             res.set(i, !res.get(i));
         }
-        System.out.println(res);
         return res;
     }
 
     @Override
     public ArrayList visitAndFilter(XPathParser.AndFilterContext ctx) {
-        ArrayList<Node> prev = this.curState;
+        ArrayList<Node> prev = new ArrayList<Node>(this.curState);
         ArrayList<Boolean> fil1List = this.visit(ctx.f(0));
         this.curState = prev;
         ArrayList<Boolean> fil2List = this.visit(ctx.f(1));
@@ -188,7 +177,7 @@ public class MyXPathVisitor extends XPathBaseVisitor<ArrayList>{
     @Override
     public ArrayList visitRpFilter(XPathParser.RpFilterContext ctx) {
         ArrayList<Boolean> res = new ArrayList<>();
-        ArrayList<Node> prevState = this.curState;
+        ArrayList<Node> prevState = new ArrayList<Node>(this.curState);
         for(Node prevNode : prevState){
             this.curState = new ArrayList<Node>();
             this.curState.add(prevNode);
@@ -202,7 +191,7 @@ public class MyXPathVisitor extends XPathBaseVisitor<ArrayList>{
     @Override
     public ArrayList visitValueEQFilter(XPathParser.ValueEQFilterContext ctx) {
         ArrayList<Boolean> res = new ArrayList<Boolean>();
-        ArrayList<Node> prev = this.curState;
+        ArrayList<Node> prev = new ArrayList<Node>(this.curState);
         ArrayList<Node> second_list = this.visit(ctx.rp(1));
 
         for(Node parent : prev){
@@ -227,7 +216,7 @@ public class MyXPathVisitor extends XPathBaseVisitor<ArrayList>{
     @Override
     public ArrayList visitIdEQFilter(XPathParser.IdEQFilterContext ctx) {
         ArrayList<Boolean> res = new ArrayList<Boolean>();
-        ArrayList<Node> prev = this.curState;
+        ArrayList<Node> prev = new ArrayList<Node>(this.curState);
         ArrayList<Node> second_list = this.visit(ctx.rp(1));
 
         for(Node parent : prev){
@@ -256,7 +245,7 @@ public class MyXPathVisitor extends XPathBaseVisitor<ArrayList>{
 
     @Override
     public ArrayList visitOrFilter(XPathParser.OrFilterContext ctx) {
-        ArrayList<Node> prev = this.curState;
+        ArrayList<Node> prev = new ArrayList<Node>(this.curState);
         ArrayList<Boolean> fil1List = this.visit(ctx.f(0));
         this.curState = prev;
         ArrayList<Boolean> fil2List = this.visit(ctx.f(1));
@@ -290,10 +279,10 @@ public class MyXPathVisitor extends XPathBaseVisitor<ArrayList>{
         ArrayList<Node> children = new ArrayList<>();
         for(Node node : this.curState){
             Element element = (Element) node;
-                for(Attribute child : element.attributes()){
-                    if(att.equals(child.getName()))
-                        children.add(child);
-                }
+            for(Attribute child : element.attributes()){
+                if(att.equals(child.getName()))
+                    children.add(child);
+            }
         }
         this.curState = children;
         return this.curState;
