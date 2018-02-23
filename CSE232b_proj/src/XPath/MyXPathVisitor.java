@@ -3,9 +3,7 @@ package XPath;
 import org.dom4j.*;
 import org.dom4j.util.NodeComparator;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Iterator;
+import java.util.*;
 
 public class MyXPathVisitor extends XPathBaseVisitor<ArrayList>{
     public ArrayList<Node> curState= new ArrayList();
@@ -108,10 +106,18 @@ public class MyXPathVisitor extends XPathBaseVisitor<ArrayList>{
 
     @Override
     public ArrayList visitCommaRP(XPathParser.CommaRPContext ctx) {
-        this.curState = this.visit(ctx.rp(0));
-        if (this.curState.isEmpty()){
-            this.curState = this.visit(ctx.rp(1));
-        }
+        ArrayList<Node> prev = this.curState;
+        ArrayList<Node> first = this.visit(ctx.rp(0));
+        this.curState = prev;
+        ArrayList<Node> second = this.visit(ctx.rp(1));
+        ArrayList<Node> total = new ArrayList<>();
+        total.addAll(first);
+        total.addAll(second);
+        this.curState = total;
+//        this.curState = this.visit(ctx.rp(0));
+//        if (this.curState.isEmpty()){
+//            this.curState = this.visit(ctx.rp(1));
+//        }
         return this.curState;
     }
 
@@ -139,6 +145,8 @@ public class MyXPathVisitor extends XPathBaseVisitor<ArrayList>{
             doubleHelper(res, node);
         this.curState = res;
         this.curState = this.visit(ctx.rp(1));
+        LinkedHashSet<Node> tmp = new LinkedHashSet<Node>(this.curState);
+        this.curState = new ArrayList<Node>(tmp);
         return this.curState;
     }
 
@@ -146,6 +154,8 @@ public class MyXPathVisitor extends XPathBaseVisitor<ArrayList>{
     public ArrayList visitSingleRP(XPathParser.SingleRPContext ctx) {
         this.curState = this.visit(ctx.rp(0));
         this.curState = this.visit(ctx.rp(1));
+        LinkedHashSet<Node> tmp = new LinkedHashSet<Node>(this.curState);
+        this.curState = new ArrayList<Node>(tmp);
         return this.curState;
     }
 

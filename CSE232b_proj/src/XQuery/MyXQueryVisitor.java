@@ -7,18 +7,8 @@ import java.util.*;
 
 public class MyXQueryVisitor extends XQueryBaseVisitor<ArrayList> {
     public ArrayList<Node> curState= new ArrayList();
-    private ArrayList<LinkedHashMap<String, ArrayList<Node>>> curCtx = new ArrayList<>();
-    public Stack<ArrayList<LinkedHashMap<String, ArrayList<Node>>>> stack = new Stack();
-
-    private void initCtx(){
-        this.curCtx.add(new LinkedHashMap<String, ArrayList<Node>>());
-        this.curCtx.add(new LinkedHashMap<String, ArrayList<Node>>());
-    }
-
-    private void initStack(){
-        initCtx();
-        this.stack.push(this.curCtx);
-    }
+    private LinkedHashMap<String, ArrayList<Node>> curCtx = new LinkedHashMap<>();
+    public Stack<LinkedHashMap<String, ArrayList<Node>>> stack = new Stack();
 
     @Override
     public ArrayList visitConstructXQ(XQueryParser.ConstructXQContext ctx) {
@@ -26,20 +16,76 @@ public class MyXQueryVisitor extends XQueryBaseVisitor<ArrayList> {
         if(!tagName.equals(ctx.ID(1).getText())) return this.curState;
         Element entry = DocumentHelper.createElement(tagName);
         this.curState = this.visit(ctx.xq());
-        for(Node node : this.curState){
-            entry.add(node);
+        for(Object obj : this.curState){
+            if(obj instanceof Node){
+                Node node = (Node)obj;
+                entry.add((Node)node.clone());
+            }
+            if(obj instanceof String){
+                String str = (String)obj;
+                entry.addText(str);
+            }
         }
         this.curState = new ArrayList<>(Arrays.asList(entry));
         return this.curState;
     }
 
+    public void getHelper(XQueryParser.FlwrXQContext ctx,
+                          ArrayList<String> vars,
+                          ArrayList<Node> prev,
+                          int i,
+                          LinkedHashMap<String, ArrayList<Node>> map,
+                          ArrayList<LinkedHashMap<String, ArrayList<Node>>> res){
+        if(i == vars.size()) {
+            res.add(new LinkedHashMap<String, ArrayList<Node>>(map));
+            return;
+        }
+        ArrayList<Node> nodes = this.visit(ctx.forClause().xq(i));
+        this.curState = new ArrayList<Node>(this.curState);
+        for(Node node : nodes) {
+            map.put(vars.get(i),
+                    new ArrayList<Node>(Arrays.asList(node)));
+            this.curCtx.put(vars.get(i),
+                    new ArrayList<Node>(Arrays.asList(node)));
+            getHelper(ctx, vars, prev, i+1, map, res);
+            map.remove(vars.get(i));
+            this.curCtx.remove(vars.get(i));
+        }
+    }
+
     @Override
     public ArrayList visitFlwrXQ(XQueryParser.FlwrXQContext ctx) {
-        this.curState = this.visit(ctx.forClause());
-        //Todo: if letClause doesn't exist
-        this.curState = this.visit(ctx.letClause());
-        this.curState = this.visit(ctx.whereClause());
-        this.curState = this.visit(ctx.returnClause());
+        ArrayList<Node> prev = new ArrayList<Node>(this.curState);
+        this.stack.push(this.curCtx);
+        //forClause
+        ArrayList<String> vars = new ArrayList<>();
+        for(int i=0 ; i<ctx.forClause().var().size() ; i++){
+            vars.add(ctx.forClause().var(i).ID().getText());
+            this.curState = new ArrayList<Node>(prev);
+        }
+
+        ArrayList<LinkedHashMap<String, ArrayList<Node>>> res = new ArrayList<>();
+        LinkedHashMap<String, ArrayList<Node>> map = new LinkedHashMap<>();
+        getHelper(ctx, vars, prev, 0, map, res);
+
+        LinkedHashMap<String, ArrayList<Node>> prevCtx = new LinkedHashMap<String, ArrayList<Node>>(this.curCtx);
+        ArrayList<Node> returnList = new ArrayList<>();
+        for(int k=0 ; k<res.size() ; k++) {
+            this.curCtx = new LinkedHashMap<String, ArrayList<Node>>(prevCtx);
+            this.curCtx.putAll(res.get(k));
+            //letClause
+            if (ctx.letClause() != null)
+                this.visit(ctx.letClause());
+            //whereClause
+            if (ctx.whereClause() != null && !(Boolean)this.visit(ctx.whereClause().cond()).get(0))
+                continue;
+            //returnClause
+            this.curState = new ArrayList<Node>(prev);
+            returnList.addAll(this.visit(ctx.returnClause().xq()));
+        }
+        this.curCtx = this.stack.pop();
+        this.curState = new ArrayList<Node>(prev);
+        this.curState.addAll(returnList);
         return this.curState;
     }
 
@@ -58,29 +104,42 @@ public class MyXQueryVisitor extends XQueryBaseVisitor<ArrayList> {
 
     @Override
     public ArrayList visitStringXQ(XQueryParser.StringXQContext ctx) {
-        return super.visitStringXQ(ctx);
+        String name = ctx.StringConstant().getText();
+        return new ArrayList<String>(Arrays.asList(name.substring(1,name.length()-1)));
     }
 
     @Override
     public ArrayList visitSingleXQ(XQueryParser.SingleXQContext ctx) {
         this.curState = this.visit(ctx.xq());
         this.curState = this.visit(ctx.rp());
+        LinkedHashSet<Node> tmp = new LinkedHashSet<Node>(this.curState);
+        this.curState = new ArrayList<Node>(tmp);
         return this.curState;
     }
 
     @Override
     public ArrayList visitCommaXQ(XQueryParser.CommaXQContext ctx) {
-        this.curState = this.visit(ctx.xq(0));
-        if (this.curState.isEmpty()){
-            this.curState = this.visit(ctx.xq(1));
-        }
+//        this.curState = this.visit(ctx.xq(0));
+//        if (this.curState.isEmpty()){
+//            this.curState = this.visit(ctx.xq(1));
+//        }
+//        return this.curState;
+        ArrayList<Node> prev = new ArrayList<Node>(this.curState);
+        ArrayList<Node> first = this.visit(ctx.xq(0));
+        this.curState = prev;
+        ArrayList<Node> second = this.visit(ctx.xq(1));
+        ArrayList<Node> total = new ArrayList<>();
+        total.addAll(first);
+        total.addAll(second);
+        this.curState = total;
         return this.curState;
     }
 
     @Override
     public ArrayList visitVarXQ(XQueryParser.VarXQContext ctx) {
-        ArrayList<Node>
-        return super.visitVarXQ(ctx);
+        String varName = ctx.var().ID().getText();
+        this.curState = this.curCtx.get(varName);
+        return this.curState;
     }
 
     @Override
@@ -97,93 +156,211 @@ public class MyXQueryVisitor extends XQueryBaseVisitor<ArrayList> {
             doubleHelper(res, node);
         this.curState = res;
         this.curState = this.visit(ctx.rp());
+        LinkedHashSet<Node> tmp = new LinkedHashSet<Node>(this.curState);
+        this.curState = new ArrayList<Node>(tmp);
         return this.curState;
     }
 
     @Override
     public ArrayList visitVar(XQueryParser.VarContext ctx) {
-        String tagName = ctx.ID().getText();
-        ArrayList<String> res = new ArrayList<>();
-        res.add(tagName);
-        return res;
+        return this.curState;
     }
 
     @Override
     public ArrayList visitForClause(XQueryParser.ForClauseContext ctx) {
-        ArrayList<String> vars = new ArrayList<>();
-        ArrayList<Node> prev = this.curState;
-        for(int i=0 ; i<ctx.var().size() ; i++){
-            //Todo: not use visitVar
-            vars.add(ctx.var(i).ID().getText());
-            this.curState = prev;
-        }
-
-        if(this.stack.isEmpty()) this.initStack();
-        for(int i=0 ; i < vars.size() ; i++){
-            this.curState = this.visit(ctx.xq(i));
-            this.curCtx.get(0).put(vars.get(i), this.curState);
-            this.curState = prev;
-        }
-        this.stack.push(this.curCtx);
         return this.curState;
     }
 
     @Override
     public ArrayList visitLetClause(XQueryParser.LetClauseContext ctx) {
-
-        return super.visitLetClause(ctx);
+        ArrayList<Node> prev = new ArrayList<Node>(this.curState);
+        ArrayList<String> vars = new ArrayList<>();
+        for(int i=0 ; i<ctx.var().size() ; i++){
+            vars.add(ctx.var(i).ID().getText());
+            this.curState = new ArrayList<Node>(prev);
+        }
+        for(int i=0 ; i < ctx.xq().size() ; i++){
+            this.curState = this.visit(ctx.xq(i));
+            this.curCtx.put(vars.get(i), this.curState);
+            this.curState = new ArrayList<Node>(prev);
+        }
+        return this.curState;
     }
 
     @Override
     public ArrayList visitWhereClause(XQueryParser.WhereClauseContext ctx) {
-        return super.visitWhereClause(ctx);
+        return this.curState;
     }
 
     @Override
     public ArrayList visitReturnClause(XQueryParser.ReturnClauseContext ctx) {
-        ArrayList<Node> prev = this.curState;
-
-        return super.visitReturnClause(ctx);
+        return this.curState;
     }
 
     @Override
     public ArrayList visitValueEQCond(XQueryParser.ValueEQCondContext ctx) {
-        return super.visitValueEQCond(ctx);
+
+        ArrayList<Boolean> res = new ArrayList<Boolean>();
+        ArrayList<Node> prev = new ArrayList<Node>(this.curState);
+        ArrayList<Node> first = this.visit(ctx.xq(0));
+        this.curState = new ArrayList<Node>(prev);
+        ArrayList<Node> second = this.visit(ctx.xq(1));
+
+        NodeComparator v = new NodeComparator();
+
+        for (Node f : first){
+            for (Node s: second){
+                if (v.compare(f, s) == 0){
+                    res.add(true);
+                    return res;
+                }
+            }
+        }
+        this.curState = new ArrayList<Node>(prev);
+        res.add(false);
+        return res;
     }
 
     @Override
     public ArrayList visitBraceCond(XQueryParser.BraceCondContext ctx) {
-        return super.visitBraceCond(ctx);
+        ArrayList<Node> prev = new ArrayList<Node>(this.curState);
+        ArrayList<Boolean> res = this.visit(ctx.cond());
+        this.curState = prev;
+        return res;
     }
 
     @Override
     public ArrayList visitOrCond(XQueryParser.OrCondContext ctx) {
-        return super.visitOrCond(ctx);
+        ArrayList<Node> prev = new ArrayList<Node>(this.curState);
+        ArrayList<Boolean> fil1List = this.visit(ctx.cond(0));
+        this.curState = new ArrayList<Node>(prev);
+        ArrayList<Boolean> fil2List = this.visit(ctx.cond(1));
+
+        assert fil1List.size() == 1;
+        assert fil2List.size() == 1;
+
+        this.curState = new ArrayList<Node>(prev);
+        ArrayList<Boolean> res = new ArrayList<>();
+        res.add(fil1List.get(0) | fil2List.get(0));
+        return res;
     }
 
     @Override
     public ArrayList visitIdEQCond(XQueryParser.IdEQCondContext ctx) {
-        return super.visitIdEQCond(ctx);
+        ArrayList<Boolean> res = new ArrayList<Boolean>();
+        ArrayList<Node> prev = new ArrayList<Node>(this.curState);
+        ArrayList<Node> first = this.visit(ctx.xq(0));
+        this.curState = new ArrayList<Node>(prev);
+        ArrayList<Node> second = this.visit(ctx.xq(1));
+
+        for (Node f : first){
+            for (Node s: second){
+                if (f.getUniquePath().equals(s.getUniquePath())){
+                    res.add(true);
+                    return res;
+                }
+            }
+        }
+        this.curState = new ArrayList<Node>(prev);
+        res.add(false);
+        return res;
     }
 
     @Override
     public ArrayList visitEmptyCond(XQueryParser.EmptyCondContext ctx) {
-        return super.visitEmptyCond(ctx);
+        ArrayList<Boolean> res = new ArrayList<>();
+        ArrayList<Node> prev = new ArrayList<Node>(this.curState);
+        ArrayList<Node> check = this.visit(ctx.xq());
+        res.add(check.isEmpty());
+        this.curState = prev;
+        return res;
     }
 
     @Override
     public ArrayList visitAndCond(XQueryParser.AndCondContext ctx) {
-        return super.visitAndCond(ctx);
+        ArrayList<Node> prev = new ArrayList<Node>(this.curState);
+        ArrayList<Boolean> fil1List = this.visit(ctx.cond(0));
+        this.curState = new ArrayList<Node>(prev);
+        ArrayList<Boolean> fil2List = this.visit(ctx.cond(1));
+
+        assert fil1List.size() == 1;
+        assert fil2List.size() == 1;
+
+        this.curState = new ArrayList<Node>(prev);
+        ArrayList<Boolean> res = new ArrayList<>();
+        res.add(fil1List.get(0) & fil2List.get(0));
+        return res;
     }
 
     @Override
     public ArrayList visitSomeCond(XQueryParser.SomeCondContext ctx) {
-        return super.visitSomeCond(ctx);
+        ArrayList<Node> prev = new ArrayList<Node>(this.curState);
+        LinkedHashMap<String, ArrayList<Node>> prevCtx = new LinkedHashMap<String, ArrayList<Node>>(this.curCtx);
+        ArrayList<Boolean> ret = new ArrayList<>();
+
+        ArrayList<String> vars = new ArrayList<>();
+        for (int i=0; i<ctx.var().size(); i++){
+            vars.add(ctx.var(i).ID().getText());
+        }
+
+        ArrayList<LinkedHashMap<String, ArrayList<Node>>> res = new ArrayList<>();
+        LinkedHashMap<String, ArrayList<Node>> map = new LinkedHashMap<>();
+        someHelper(ctx, vars, prev, 0, map, res);
+
+        for (LinkedHashMap<String, ArrayList<Node>> m: res){
+            LinkedHashMap<String, ArrayList<Node>> newCtx = new LinkedHashMap<>();
+            newCtx.putAll(prevCtx);
+            newCtx.putAll(m);
+            this.curCtx = newCtx;
+            this.curState = new ArrayList<Node>(prev);
+
+            ArrayList<Boolean> ans = this.visit(ctx.cond());
+            assert ans.size() == 1;
+
+            if (ans.get(0)){
+                ret.add(true);
+                return ret;
+            }
+        }
+        this.curState = new ArrayList<Node>(prev);
+        this.curCtx = new LinkedHashMap<String, ArrayList<Node>>(prevCtx);
+
+        ret.add(false);
+        return ret;
+    }
+
+    public void someHelper(XQueryParser.SomeCondContext ctx,
+                           ArrayList<String> vars,
+                           ArrayList<Node> prev,
+                           int i,
+                           LinkedHashMap<String, ArrayList<Node>> map,
+                           ArrayList<LinkedHashMap<String, ArrayList<Node>>> res){
+        if(i == vars.size()) {
+            res.add(new LinkedHashMap<String, ArrayList<Node>>(map));
+            return;
+        }
+        this.curState = new ArrayList<Node>(prev);
+        ArrayList<Node> nodes = this.visit(ctx.xq(i));
+        for(Node node : nodes) {
+            map.put(vars.get(i),
+                    new ArrayList<Node>(Arrays.asList(node)));
+            this.curCtx.put(vars.get(i),
+                    new ArrayList<Node>(Arrays.asList(node)));
+            someHelper(ctx, vars, prev, i+1, map, res);
+            map.remove(vars.get(i));
+            this.curCtx.remove(vars.get(i));
+        }
     }
 
     @Override
     public ArrayList visitNotCond(XQueryParser.NotCondContext ctx) {
-        return super.visitNotCond(ctx);
+        ArrayList<Node> prev = new ArrayList<Node>(this.curState);
+        ArrayList<Boolean> res = this.visit(ctx.cond());
+
+        this.curState = prev;
+        assert res.size() == 1;
+        res.set(0, !res.get(0));
+        return res;
     }
 
     @Override
@@ -279,10 +456,18 @@ public class MyXQueryVisitor extends XQueryBaseVisitor<ArrayList> {
 
     @Override
     public ArrayList visitCommaRP(XQueryParser.CommaRPContext ctx) {
-        this.curState = this.visit(ctx.rp(0));
-        if (this.curState.isEmpty()){
-            this.curState = this.visit(ctx.rp(1));
-        }
+        ArrayList<Node> prev = new ArrayList<Node>(this.curState);
+        ArrayList<Node> first = this.visit(ctx.rp(0));
+        this.curState = prev;
+        ArrayList<Node> second = this.visit(ctx.rp(1));
+        ArrayList<Node> total = new ArrayList<>();
+        total.addAll(first);
+        total.addAll(second);
+        this.curState = total;
+//        this.curState = this.visit(ctx.rp(0));
+//        if (this.curState.isEmpty()){
+//            this.curState = this.visit(ctx.rp(1));
+//        }
         return this.curState;
     }
 
@@ -310,6 +495,8 @@ public class MyXQueryVisitor extends XQueryBaseVisitor<ArrayList> {
             doubleHelper(res, node);
         this.curState = res;
         this.curState = this.visit(ctx.rp(1));
+        LinkedHashSet<Node> tmp = new LinkedHashSet<Node>(this.curState);
+        this.curState = new ArrayList<Node>(tmp);
         return this.curState;
     }
 
@@ -317,6 +504,8 @@ public class MyXQueryVisitor extends XQueryBaseVisitor<ArrayList> {
     public ArrayList visitSingleRP(XQueryParser.SingleRPContext ctx) {
         this.curState = this.visit(ctx.rp(0));
         this.curState = this.visit(ctx.rp(1));
+        LinkedHashSet<Node> tmp = new LinkedHashSet<Node>(this.curState);
+        this.curState = new ArrayList<Node>(tmp);
         return this.curState;
     }
 
@@ -332,7 +521,7 @@ public class MyXQueryVisitor extends XQueryBaseVisitor<ArrayList> {
 
     @Override
     public ArrayList visitAndFilter(XQueryParser.AndFilterContext ctx) {
-        ArrayList<Node> prev = this.curState;
+        ArrayList<Node> prev = new ArrayList<Node>(this.curState);
         ArrayList<Boolean> fil1List = this.visit(ctx.f(0));
         this.curState = prev;
         ArrayList<Boolean> fil2List = this.visit(ctx.f(1));
@@ -349,7 +538,7 @@ public class MyXQueryVisitor extends XQueryBaseVisitor<ArrayList> {
     @Override
     public ArrayList visitRpFilter(XQueryParser.RpFilterContext ctx) {
         ArrayList<Boolean> res = new ArrayList<>();
-        ArrayList<Node> prevState = this.curState;
+        ArrayList<Node> prevState = new ArrayList<Node>(this.curState);
         for(Node prevNode : prevState){
             this.curState = new ArrayList<Node>();
             this.curState.add(prevNode);
@@ -363,7 +552,7 @@ public class MyXQueryVisitor extends XQueryBaseVisitor<ArrayList> {
     @Override
     public ArrayList visitValueEQFilter(XQueryParser.ValueEQFilterContext ctx) {
         ArrayList<Boolean> res = new ArrayList<Boolean>();
-        ArrayList<Node> prev = this.curState;
+        ArrayList<Node> prev = new ArrayList<Node>(this.curState);
         ArrayList<Node> second_list = this.visit(ctx.rp(1));
 
         for(Node parent : prev){
@@ -388,7 +577,7 @@ public class MyXQueryVisitor extends XQueryBaseVisitor<ArrayList> {
     @Override
     public ArrayList visitIdEQFilter(XQueryParser.IdEQFilterContext ctx) {
         ArrayList<Boolean> res = new ArrayList<Boolean>();
-        ArrayList<Node> prev = this.curState;
+        ArrayList<Node> prev = new ArrayList<Node>(this.curState);
         ArrayList<Node> second_list = this.visit(ctx.rp(1));
 
         for(Node parent : prev){
@@ -417,7 +606,7 @@ public class MyXQueryVisitor extends XQueryBaseVisitor<ArrayList> {
 
     @Override
     public ArrayList visitOrFilter(XQueryParser.OrFilterContext ctx) {
-        ArrayList<Node> prev = this.curState;
+        ArrayList<Node> prev = new ArrayList<Node>(this.curState);
         ArrayList<Boolean> fil1List = this.visit(ctx.f(0));
         this.curState = prev;
         ArrayList<Boolean> fil2List = this.visit(ctx.f(1));
