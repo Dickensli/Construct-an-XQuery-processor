@@ -202,20 +202,33 @@ public class MyXQueryVisitor extends XQueryBaseVisitor<ArrayList> {
 
         ArrayList<Boolean> res = new ArrayList<Boolean>();
         ArrayList<Node> prev = new ArrayList<Node>(this.curState);
-        ArrayList<Node> first = this.visit(ctx.xq(0));
+        ArrayList<Object> first = this.visit(ctx.xq(0));
         this.curState = new ArrayList<Node>(prev);
-        ArrayList<Node> second = this.visit(ctx.xq(1));
+        ArrayList<Object> second = this.visit(ctx.xq(1));
 
         NodeComparator v = new NodeComparator();
 
-        for (Node f : first){
-            for (Node s: second){
-                if (v.compare(f, s) == 0){
-                    res.add(true);
-                    return res;
+        for (Object obj1 : first){
+            for (Object obj2: second){
+                if (obj1 instanceof Node && obj2 instanceof Node){
+                    Node node1 = (Node)obj1;
+                    Node node2 = (Node)obj2;
+                    if (v.compare(node1,node2)==0){
+                        res.add(true);
+                        return res;
+                    }
+                }
+                if (obj1 instanceof String && obj2 instanceof String){
+                    String str1 = (String)obj1;
+                    String str2 = (String)obj2;
+                    if (str1.equals(str2)){
+                        res.add(true);
+                        return res;
+                    }
                 }
             }
         }
+
         this.curState = new ArrayList<Node>(prev);
         res.add(false);
         return res;
