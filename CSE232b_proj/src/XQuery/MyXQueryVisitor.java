@@ -591,20 +591,43 @@ public class MyXQueryVisitor extends XQueryBaseVisitor<ArrayList> {
     public ArrayList visitIdEQFilter(XQueryParser.IdEQFilterContext ctx) {
         ArrayList<Boolean> res = new ArrayList<Boolean>();
         ArrayList<Node> prev = new ArrayList<Node>(this.curState);
-        ArrayList<Node> second_list = this.visit(ctx.rp(1));
+        ArrayList<Object> second_list = this.visit(ctx.rp(1));
 
         for(Node parent : prev){
             this.curState = new ArrayList<Node>(Arrays.asList(parent));
-            ArrayList<Node> first_list = this.visit(ctx.rp(0));
-            res.add(this.IdCompare(first_list, second_list));
+            ArrayList<Object> first_list = this.visit(ctx.rp(0));
+            if(first_list.size() > 0 && second_list.size() > 0){
+                if(first_list.get(0) instanceof String){
+                    res.add(this.IdStrCompare(first_list, second_list));
+                }
+                else if(first_list.get(0) instanceof Node){
+                    res.add(this.IdCompare(first_list, second_list));
+                }
+            }else{
+                res.add(false);
+            }
         }
         return res;
     }
 
-    private Boolean IdCompare(ArrayList<Node> list1, ArrayList<Node> list2){
-        for(Node node1 : list1) {
-            for (Node node2 : list2) {
+    private Boolean IdCompare(ArrayList<Object> list1, ArrayList<Object> list2){
+        for(Object node1_ : list1) {
+            Node node1 = (Node)node1_;
+            for (Object node2_ : list2) {
+                Node node2 = (Node)node2_;
                 if (node1.getUniquePath().equals(node2.getUniquePath()))
+                    return true;
+            }
+        }
+        return false;
+    }
+
+    private Boolean IdStrCompare(ArrayList<Object> list1, ArrayList<Object> list2){
+        for(Object node1_ : list1) {
+            String node1 = (String)node1_;
+            for (Object node2_ : list2) {
+                String node2 = (String)node2_;
+                if (node1.equals(node2))
                     return true;
             }
         }
