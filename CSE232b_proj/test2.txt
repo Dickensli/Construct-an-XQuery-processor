@@ -1,0 +1,31 @@
+<?xml version = "1.0"?>
+<books>
+    <book>
+        <author>
+            <first>aaf</first>
+            <last>aal</last>
+        </author>
+        <author>
+            <first>af</first>
+            <last>al</last>
+        </author>
+    </book>
+
+    <book>
+        <author>
+            <first>af</first>
+            <last>al</last>
+        </author>
+        <author>
+            <first>bf</first>
+            <last>bl</last>
+        </author>
+    </book>
+
+    <book>
+        <author>
+            <first>bf</first>
+            <last>bl</last>
+        </author>
+    </book>
+</books>
