@@ -1,4 +1,4 @@
-// Generated from C:/Users/Dickensli/Desktop/cse232/CSE232b_proj/src/proj\XQuery.g4 by ANTLR 4.7
+// Generated from C:/Users/Dickensli/Desktop/cse232/CSE232b_proj/src/XQuery\XQuery.g4 by ANTLR 4.7
 package XQuery;
 
 import org.antlr.v4.runtime.ParserRuleContext;
@@ -119,6 +119,18 @@ public class XQueryBaseListener implements XQueryListener {
 	 * <p>The default implementation does nothing.</p>
 	 */
 	@Override public void exitBraceXQ(XQueryParser.BraceXQContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterJoinXQ(XQueryParser.JoinXQContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitJoinXQ(XQueryParser.JoinXQContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *
@@ -287,6 +299,18 @@ public class XQueryBaseListener implements XQueryListener {
 	 * <p>The default implementation does nothing.</p>
 	 */
 	@Override public void exitNotCond(XQueryParser.NotCondContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void enterAttrs(XQueryParser.AttrsContext ctx) { }
+	/**
+	 * {@inheritDoc}
+	 *
+	 * <p>The default implementation does nothing.</p>
+	 */
+	@Override public void exitAttrs(XQueryParser.AttrsContext ctx) { }
 	/**
 	 * {@inheritDoc}
 	 *

@@ -1,4 +1,4 @@
-// Generated from C:/Users/Dickensli/Desktop/cse232/CSE232b_proj/src/proj\XQuery.g4 by ANTLR 4.7
+// Generated from C:/Users/Dickensli/Desktop/cse232/CSE232b_proj/src/XQuery\XQuery.g4 by ANTLR 4.7
 package XQuery;
 import org.antlr.v4.runtime.tree.ParseTreeVisitor;
 
@@ -73,6 +73,13 @@ public interface XQueryVisitor<T> extends ParseTreeVisitor<T> {
 	 * @return the visitor result
 	 */
 	T visitBraceXQ(XQueryParser.BraceXQContext ctx);
+	/**
+	 * Visit a parse tree produced by the {@code joinXQ}
+	 * labeled alternative in {@link XQueryParser#xq}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitJoinXQ(XQueryParser.JoinXQContext ctx);
 	/**
 	 * Visit a parse tree produced by the {@code doubleXQ}
 	 * labeled alternative in {@link XQueryParser#xq}.
@@ -166,6 +173,12 @@ public interface XQueryVisitor<T> extends ParseTreeVisitor<T> {
 	 * @return the visitor result
 	 */
 	T visitNotCond(XQueryParser.NotCondContext ctx);
+	/**
+	 * Visit a parse tree produced by {@link XQueryParser#attrs}.
+	 * @param ctx the parse tree
+	 * @return the visitor result
+	 */
+	T visitAttrs(XQueryParser.AttrsContext ctx);
 	/**
 	 * Visit a parse tree produced by {@link XQueryParser#doc}.
 	 * @param ctx the parse tree

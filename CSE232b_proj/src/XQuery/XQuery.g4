@@ -13,6 +13,7 @@ xq  : var													    # varXQ
 	| '<' ID '>' '{' xq '}' '<' '/' ID '>'					# constructXQ
 	| forClause letClause? whereClause? returnClause    		# flwrXQ
 	| letClause xq 												# letXQ
+	| 'join''(' xq ',' xq ',' attrs ',' attrs ')'            # joinXQ
 	;
 
 
@@ -35,7 +36,6 @@ whereClause : 'where' cond
 returnClause: 'return' xq
 	        ;
 
-
 cond: xq ValueEQ xq 									     # valueEQCond
 	| xq IdEQ xq 											 # idEQCond
 	| 'empty' '(' xq ')' 		 							 # emptyCond
@@ -48,3 +48,4 @@ cond: xq ValueEQ xq 									     # valueEQCond
 
 
 StringConstant: '"'+[a-zA-Z0-9,.!?; '"-]+'"';
+attrs: '[' ID (',' ID)* ']';

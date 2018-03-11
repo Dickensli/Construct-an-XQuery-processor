@@ -1,4 +1,4 @@
-// Generated from C:/Users/Dickensli/Desktop/cse232/CSE232b_proj/src/proj\XQuery.g4 by ANTLR 4.7
+// Generated from C:/Users/Dickensli/Desktop/cse232/CSE232b_proj/src/XQuery\XQuery.g4 by ANTLR 4.7
 package XQuery;
 import org.antlr.v4.runtime.tree.ParseTreeListener;
 
@@ -115,6 +115,18 @@ public interface XQueryListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitBraceXQ(XQueryParser.BraceXQContext ctx);
+	/**
+	 * Enter a parse tree produced by the {@code joinXQ}
+	 * labeled alternative in {@link XQueryParser#xq}.
+	 * @param ctx the parse tree
+	 */
+	void enterJoinXQ(XQueryParser.JoinXQContext ctx);
+	/**
+	 * Exit a parse tree produced by the {@code joinXQ}
+	 * labeled alternative in {@link XQueryParser#xq}.
+	 * @param ctx the parse tree
+	 */
+	void exitJoinXQ(XQueryParser.JoinXQContext ctx);
 	/**
 	 * Enter a parse tree produced by the {@code doubleXQ}
 	 * labeled alternative in {@link XQueryParser#xq}.
@@ -273,6 +285,16 @@ public interface XQueryListener extends ParseTreeListener {
 	 * @param ctx the parse tree
 	 */
 	void exitNotCond(XQueryParser.NotCondContext ctx);
+	/**
+	 * Enter a parse tree produced by {@link XQueryParser#attrs}.
+	 * @param ctx the parse tree
+	 */
+	void enterAttrs(XQueryParser.AttrsContext ctx);
+	/**
+	 * Exit a parse tree produced by {@link XQueryParser#attrs}.
+	 * @param ctx the parse tree
+	 */
+	void exitAttrs(XQueryParser.AttrsContext ctx);
 	/**
 	 * Enter a parse tree produced by {@link XQueryParser#doc}.
 	 * @param ctx the parse tree
