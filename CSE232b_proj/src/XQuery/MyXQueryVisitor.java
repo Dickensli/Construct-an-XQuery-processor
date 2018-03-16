@@ -159,27 +159,9 @@ public class MyXQueryVisitor extends XQueryBaseVisitor<ArrayList> {
     public ArrayList visitSingleXQ(XQueryParser.SingleXQContext ctx) {
         ArrayList<Node> prev = new ArrayList<>(this.curState);
 
-        System.out.println("this is singleXQ start start");
-        System.out.println(this.curState.size());
-        System.out.println("this is singleXQ start end");
-        System.out.println();
-
         ArrayList vv = this.visit(ctx.xq());
         this.curState = new ArrayList<>(vv);
-
-        System.out.println("this is after $x/$y start");
-        System.out.println(((Node)vv.get(0)).getUniquePath());
-        System.out.println("this is after $x/$y end");
-        System.out.println();
-
         this.curState = this.visit(ctx.rp());
-
-        System.out.println("this is after rp start");
-        System.out.println(this.curState.get(0).getUniquePath());
-        System.out.println("this is after rp end");
-        System.out.println();
-
-        System.out.println();
         LinkedHashSet<Node> tmp = new LinkedHashSet<Node>(this.curState);
         this.curState = new ArrayList<>(prev);
 //        System.out.println("SingleXQ output start");
@@ -198,42 +180,16 @@ public class MyXQueryVisitor extends XQueryBaseVisitor<ArrayList> {
 
     @Override
     public ArrayList visitCommaXQ(XQueryParser.CommaXQContext ctx) {
-//        this.curState = this.visit(ctx.xq(0));
-//        if (this.curState.isEmpty()){
-//            this.curState = this.visit(ctx.xq(1));
-//        }
-//        return this.curState;
         ArrayList<Node> prev = new ArrayList<Node>(this.curState);
-
-        System.out.println("In comma curState begin");
-        System.out.println(this.curState.size());
-        System.out.println("In comma curState begin");
-        System.out.println();
 
         ArrayList<Node> first = this.visit(ctx.xq(0));
         this.curState = new ArrayList<Node>(prev);
-
-        System.out.println("this is after comma");
-        System.out.println(this.curState.size());
-        System.out.println("this is after comma");
-        System.out.println();
 
         ArrayList<Node> second = this.visit(ctx.xq(1));
         ArrayList<Node> total = new ArrayList<>();
         total.addAll(first);
         total.addAll(second);
         this.curState = new ArrayList<Node>(prev);
-//        System.out.println("Comma output start");
-//        for(Node n:total) {
-//            try {
-//                OutputFormat format = OutputFormat.createPrettyPrint();
-//                XMLWriter writer = new XMLWriter(System.out, format);
-//                writer.write(n);
-//            } catch (Exception e) {
-//                System.out.println("lalalalaa");
-//            }
-//        }
-//        System.out.println("Comma output end");
         return total;
     }
 
@@ -246,17 +202,6 @@ public class MyXQueryVisitor extends XQueryBaseVisitor<ArrayList> {
     @Override
     public ArrayList visitBraceXQ(XQueryParser.BraceXQContext ctx) {
         ArrayList<Node> res = this.visit(ctx.xq());
-        System.out.println("In brace!! start");
-        for(Node n : res){
-            try {
-                OutputFormat format = OutputFormat.createPrettyPrint();
-                XMLWriter writer = new XMLWriter(System.out, format);
-                writer.write(n);
-            } catch (Exception e) {
-                System.out.println("lalalalaa");
-            }
-        }
-        System.out.println("In brace!! end");
         return res;
     }
 
@@ -281,7 +226,10 @@ public class MyXQueryVisitor extends XQueryBaseVisitor<ArrayList> {
             ArrayList<Node> leftNodes = new ArrayList<>();
             for (String att : smatt) {
                 //todo: what if two atts have the same name
-                leftNodes.add(s.selectNodes(att.concat("/*")).get(0));
+                if(s.selectNodes(att.concat("/*")).size() != 0)
+                    leftNodes.add(s.selectNodes(att.concat("/*")).get(0));
+                else
+                    leftNodes.add(s.selectNodes(att.concat("/text()")).get(0));
             }
             ListKeys leftKeys = new ListKeys(leftNodes);
             if (joinHash.get(leftKeys) == null)
@@ -293,7 +241,10 @@ public class MyXQueryVisitor extends XQueryBaseVisitor<ArrayList> {
             ArrayList<Node> rightNodes = new ArrayList<>();
             for (String att : latt) {
                 //todo: what if two atts have the same name
-                rightNodes.add(s.selectNodes(att.concat("/*")).get(0));
+                if(s.selectNodes(att.concat("/*")).size() != 0)
+                    rightNodes.add(s.selectNodes(att.concat("/*")).get(0));
+                else
+                    rightNodes.add(s.selectNodes(att.concat("/text()")).get(0));
             }
             ListKeys rightKeys = new ListKeys(rightNodes);
             if(!joinHash.containsKey(rightKeys))
@@ -914,7 +865,8 @@ public class MyXQueryVisitor extends XQueryBaseVisitor<ArrayList> {
             String var2 = whereList[i][1];
             // check if pattern is $a = "John"
             if (!var1.startsWith("$") || !var2.startsWith("$")) {
-                stringMapping.put(var1, var2);
+                if (!var1.startsWith("$"))  stringMapping.put(var2, var1);
+                else stringMapping.put(var1, var2);
                 continue;
             }
 
@@ -979,12 +931,17 @@ public class MyXQueryVisitor extends XQueryBaseVisitor<ArrayList> {
 
         HashSet<String> visited = new HashSet<>();
         Set<ArrayList<String>> rootPairSet = mapping.keySet();
+        ArrayList<ArrayList<String>> rootPairList = new ArrayList();
+        rootPairList.addAll(rootPairSet);
 
         int index = 0;
-        int size = mapping.size();
-        for (ArrayList<String> rootPair: mapping.keySet()) {
+//        int size = mapping.size();
+        while (!rootPairList.isEmpty()) {
+            boolean notPaired = false;
+            ArrayList<String> rootPair = rootPairList.get(0);
             String root1 = rootPair.get(0);
             String root2 = rootPair.get(1);
+
             ArrayList<ArrayList<String>> varValues = mapping.get(rootPair);
 
             if (index == 0) {
@@ -1003,17 +960,21 @@ public class MyXQueryVisitor extends XQueryBaseVisitor<ArrayList> {
                     output += printBlock(blocks.get(root1), varPaths, stringMapping) + ",";
                     output += "[" + String.join(",", varValues.get(1)) + "], ";
                     output += "[" + String.join(",", varValues.get(0)) + "])";
-                } else {
-                    System.out.println("Not joining to the others!");
+                }
+                else {
+                    notPaired = true;
+                    rootPairList.add(rootPair);
+//                    System.out.println("Not joining to the others!");
                 }
             }
-            if (index < size-1) {
+            if (rootPairList.size() > 1 && notPaired == false) {
                 output += ",";
             }
 
             visited.add(root1);
             visited.add(root2);
             index++;
+            rootPairList.remove(0);
 
         }
 

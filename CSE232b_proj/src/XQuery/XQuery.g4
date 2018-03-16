@@ -7,9 +7,9 @@ xq  : var													    # varXQ
 	| StringConstant											# stringXQ
 	| ap														# apXQ
 	| '(' xq ')'												# braceXQ
-	| xq ',' xq 											    # commaXQ
 	| xq '/' rp													# singleXQ
 	| xq '//' rp 												# doubleXQ
+    | xq ',' xq 											    # commaXQ
 	| '<' ID '>' '{' xq '}' '<' '/' ID '>'					# constructXQ
 	| forClause letClause? whereClause? returnClause    		# flwrXQ
 	| letClause xq 												# letXQ

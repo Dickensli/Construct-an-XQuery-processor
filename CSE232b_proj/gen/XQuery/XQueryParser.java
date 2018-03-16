@@ -33,7 +33,7 @@ public class XQueryParser extends Parser {
 	};
 
 	private static final String[] _LITERAL_NAMES = {
-		null, "'('", "')'", "','", "'/'", "'//'", "'<'", "'>'", "'{'", "'}'", 
+		null, "'('", "')'", "'/'", "'//'", "','", "'<'", "'>'", "'{'", "'}'", 
 		"'join'", "'$'", "'for'", "'in'", "'let'", "':='", "'where'", "'return'", 
 		"'empty'", "'some'", "'satisfies'", "'and'", "'or'", "'not'", "'['", "']'", 
 		"'doc(\"'", "'\")'", "'*'", "'.'", "'..'", "'text()'", "'@'"
@@ -426,7 +426,7 @@ public class XQueryParser extends Parser {
 				setState(44);
 				match(T__5);
 				setState(45);
-				match(T__3);
+				match(T__2);
 				setState(46);
 				match(ID);
 				setState(47);
@@ -487,15 +487,15 @@ public class XQueryParser extends Parser {
 				setState(63);
 				xq(0);
 				setState(64);
-				match(T__2);
+				match(T__4);
 				setState(65);
 				xq(0);
 				setState(66);
-				match(T__2);
+				match(T__4);
 				setState(67);
 				attrs();
 				setState(68);
-				match(T__2);
+				match(T__4);
 				setState(69);
 				attrs();
 				setState(70);
@@ -522,11 +522,11 @@ public class XQueryParser extends Parser {
 						_localctx = new CommaXQContext(new XqContext(_parentctx, _parentState));
 						pushNewRecursionContext(_localctx, _startState, RULE_xq);
 						setState(74);
-						if (!(precpred(_ctx, 7))) throw new FailedPredicateException(this, "precpred(_ctx, 7)");
+						if (!(precpred(_ctx, 5))) throw new FailedPredicateException(this, "precpred(_ctx, 5)");
 						setState(75);
-						match(T__2);
+						match(T__4);
 						setState(76);
-						xq(8);
+						xq(6);
 						}
 						break;
 					case 2:
@@ -534,9 +534,9 @@ public class XQueryParser extends Parser {
 						_localctx = new SingleXQContext(new XqContext(_parentctx, _parentState));
 						pushNewRecursionContext(_localctx, _startState, RULE_xq);
 						setState(77);
-						if (!(precpred(_ctx, 6))) throw new FailedPredicateException(this, "precpred(_ctx, 6)");
+						if (!(precpred(_ctx, 7))) throw new FailedPredicateException(this, "precpred(_ctx, 7)");
 						setState(78);
-						match(T__3);
+						match(T__2);
 						setState(79);
 						rp(0);
 						}
@@ -546,9 +546,9 @@ public class XQueryParser extends Parser {
 						_localctx = new DoubleXQContext(new XqContext(_parentctx, _parentState));
 						pushNewRecursionContext(_localctx, _startState, RULE_xq);
 						setState(80);
-						if (!(precpred(_ctx, 5))) throw new FailedPredicateException(this, "precpred(_ctx, 5)");
+						if (!(precpred(_ctx, 6))) throw new FailedPredicateException(this, "precpred(_ctx, 6)");
 						setState(81);
-						match(T__4);
+						match(T__3);
 						setState(82);
 						rp(0);
 						}
@@ -667,11 +667,11 @@ public class XQueryParser extends Parser {
 			setState(102);
 			_errHandler.sync(this);
 			_la = _input.LA(1);
-			while (_la==T__2) {
+			while (_la==T__4) {
 				{
 				{
 				setState(95);
-				match(T__2);
+				match(T__4);
 				setState(96);
 				var();
 				setState(97);
@@ -747,11 +747,11 @@ public class XQueryParser extends Parser {
 			setState(116);
 			_errHandler.sync(this);
 			_la = _input.LA(1);
-			while (_la==T__2) {
+			while (_la==T__4) {
 				{
 				{
 				setState(109);
-				match(T__2);
+				match(T__4);
 				setState(110);
 				var();
 				setState(111);
@@ -1136,11 +1136,11 @@ public class XQueryParser extends Parser {
 				setState(150);
 				_errHandler.sync(this);
 				_la = _input.LA(1);
-				while (_la==T__2) {
+				while (_la==T__4) {
 					{
 					{
 					setState(143);
-					match(T__2);
+					match(T__4);
 					setState(144);
 					var();
 					setState(145);
@@ -1278,11 +1278,11 @@ public class XQueryParser extends Parser {
 			setState(181);
 			_errHandler.sync(this);
 			_la = _input.LA(1);
-			while (_la==T__2) {
+			while (_la==T__4) {
 				{
 				{
 				setState(177);
-				match(T__2);
+				match(T__4);
 				setState(178);
 				match(ID);
 				}
@@ -1424,7 +1424,7 @@ public class XQueryParser extends Parser {
 				setState(190);
 				doc();
 				setState(191);
-				match(T__3);
+				match(T__2);
 				setState(192);
 				rp(0);
 				}
@@ -1436,7 +1436,7 @@ public class XQueryParser extends Parser {
 				setState(194);
 				doc();
 				setState(195);
-				match(T__4);
+				match(T__3);
 				setState(196);
 				rp(0);
 				}
@@ -1785,7 +1785,7 @@ public class XQueryParser extends Parser {
 						setState(214);
 						if (!(precpred(_ctx, 4))) throw new FailedPredicateException(this, "precpred(_ctx, 4)");
 						setState(215);
-						match(T__3);
+						match(T__2);
 						setState(216);
 						rp(5);
 						}
@@ -1797,7 +1797,7 @@ public class XQueryParser extends Parser {
 						setState(217);
 						if (!(precpred(_ctx, 3))) throw new FailedPredicateException(this, "precpred(_ctx, 3)");
 						setState(218);
-						match(T__4);
+						match(T__3);
 						setState(219);
 						rp(4);
 						}
@@ -1809,7 +1809,7 @@ public class XQueryParser extends Parser {
 						setState(220);
 						if (!(precpred(_ctx, 1))) throw new FailedPredicateException(this, "precpred(_ctx, 1)");
 						setState(221);
-						match(T__2);
+						match(T__4);
 						setState(222);
 						rp(2);
 						}
@@ -2284,11 +2284,11 @@ public class XQueryParser extends Parser {
 	private boolean xq_sempred(XqContext _localctx, int predIndex) {
 		switch (predIndex) {
 		case 0:
-			return precpred(_ctx, 7);
-		case 1:
-			return precpred(_ctx, 6);
-		case 2:
 			return precpred(_ctx, 5);
+		case 1:
+			return precpred(_ctx, 7);
+		case 2:
+			return precpred(_ctx, 6);
 		}
 		return true;
 	}
@@ -2349,19 +2349,19 @@ public class XQueryParser extends Parser {
 		"\3\2\2\2\26\u00d6\3\2\2\2\30\u00fb\3\2\2\2\32\u0108\3\2\2\2\34\u010a\3"+
 		"\2\2\2\36\u010c\3\2\2\2 !\b\2\1\2!K\5\4\3\2\"K\7#\2\2#K\5\24\13\2$%\7"+
 		"\3\2\2%&\5\2\2\2&\'\7\4\2\2\'K\3\2\2\2()\7\b\2\2)*\7&\2\2*+\7\t\2\2+,"+
-		"\7\n\2\2,-\5\2\2\2-.\7\13\2\2./\7\b\2\2/\60\7\6\2\2\60\61\7&\2\2\61\62"+
+		"\7\n\2\2,-\5\2\2\2-.\7\13\2\2./\7\b\2\2/\60\7\5\2\2\60\61\7&\2\2\61\62"+
 		"\7\t\2\2\62K\3\2\2\2\63\65\5\6\4\2\64\66\5\b\5\2\65\64\3\2\2\2\65\66\3"+
 		"\2\2\2\668\3\2\2\2\679\5\n\6\28\67\3\2\2\289\3\2\2\29:\3\2\2\2:;\5\f\7"+
 		"\2;K\3\2\2\2<=\5\b\5\2=>\5\2\2\4>K\3\2\2\2?@\7\f\2\2@A\7\3\2\2AB\5\2\2"+
-		"\2BC\7\5\2\2CD\5\2\2\2DE\7\5\2\2EF\5\20\t\2FG\7\5\2\2GH\5\20\t\2HI\7\4"+
+		"\2BC\7\7\2\2CD\5\2\2\2DE\7\7\2\2EF\5\20\t\2FG\7\7\2\2GH\5\20\t\2HI\7\4"+
 		"\2\2IK\3\2\2\2J \3\2\2\2J\"\3\2\2\2J#\3\2\2\2J$\3\2\2\2J(\3\2\2\2J\63"+
-		"\3\2\2\2J<\3\2\2\2J?\3\2\2\2KW\3\2\2\2LM\f\t\2\2MN\7\5\2\2NV\5\2\2\nO"+
-		"P\f\b\2\2PQ\7\6\2\2QV\5\26\f\2RS\f\7\2\2ST\7\7\2\2TV\5\26\f\2UL\3\2\2"+
+		"\3\2\2\2J<\3\2\2\2J?\3\2\2\2KW\3\2\2\2LM\f\7\2\2MN\7\7\2\2NV\5\2\2\bO"+
+		"P\f\t\2\2PQ\7\5\2\2QV\5\26\f\2RS\f\b\2\2ST\7\6\2\2TV\5\26\f\2UL\3\2\2"+
 		"\2UO\3\2\2\2UR\3\2\2\2VY\3\2\2\2WU\3\2\2\2WX\3\2\2\2X\3\3\2\2\2YW\3\2"+
 		"\2\2Z[\7\r\2\2[\\\7&\2\2\\\5\3\2\2\2]^\7\16\2\2^_\5\4\3\2_`\7\17\2\2`"+
-		"h\5\2\2\2ab\7\5\2\2bc\5\4\3\2cd\7\17\2\2de\5\2\2\2eg\3\2\2\2fa\3\2\2\2"+
+		"h\5\2\2\2ab\7\7\2\2bc\5\4\3\2cd\7\17\2\2de\5\2\2\2eg\3\2\2\2fa\3\2\2\2"+
 		"gj\3\2\2\2hf\3\2\2\2hi\3\2\2\2i\7\3\2\2\2jh\3\2\2\2kl\7\20\2\2lm\5\4\3"+
-		"\2mn\7\21\2\2nv\5\2\2\2op\7\5\2\2pq\5\4\3\2qr\7\21\2\2rs\5\2\2\2su\3\2"+
+		"\2mn\7\21\2\2nv\5\2\2\2op\7\7\2\2pq\5\4\3\2qr\7\21\2\2rs\5\2\2\2su\3\2"+
 		"\2\2to\3\2\2\2ux\3\2\2\2vt\3\2\2\2vw\3\2\2\2w\t\3\2\2\2xv\3\2\2\2yz\7"+
 		"\22\2\2z{\5\16\b\2{\13\3\2\2\2|}\7\23\2\2}~\5\2\2\2~\r\3\2\2\2\177\u0080"+
 		"\b\b\1\2\u0080\u0081\5\2\2\2\u0081\u0082\7$\2\2\u0082\u0083\5\2\2\2\u0083"+
@@ -2369,7 +2369,7 @@ public class XQueryParser extends Parser {
 		"\2\2\u0087\u00a5\3\2\2\2\u0088\u0089\7\24\2\2\u0089\u008a\7\3\2\2\u008a"+
 		"\u008b\5\2\2\2\u008b\u008c\7\4\2\2\u008c\u00a5\3\2\2\2\u008d\u008e\7\25"+
 		"\2\2\u008e\u008f\5\4\3\2\u008f\u0090\7\17\2\2\u0090\u0098\5\2\2\2\u0091"+
-		"\u0092\7\5\2\2\u0092\u0093\5\4\3\2\u0093\u0094\7\17\2\2\u0094\u0095\5"+
+		"\u0092\7\7\2\2\u0092\u0093\5\4\3\2\u0093\u0094\7\17\2\2\u0094\u0095\5"+
 		"\2\2\2\u0095\u0097\3\2\2\2\u0096\u0091\3\2\2\2\u0097\u009a\3\2\2\2\u0098"+
 		"\u0096\3\2\2\2\u0098\u0099\3\2\2\2\u0099\u009b\3\2\2\2\u009a\u0098\3\2"+
 		"\2\2\u009b\u009c\7\26\2\2\u009c\u009d\5\16\b\7\u009d\u00a5\3\2\2\2\u009e"+
@@ -2381,12 +2381,12 @@ public class XQueryParser extends Parser {
 		"\30\2\2\u00ab\u00ad\5\16\b\5\u00ac\u00a6\3\2\2\2\u00ac\u00a9\3\2\2\2\u00ad"+
 		"\u00b0\3\2\2\2\u00ae\u00ac\3\2\2\2\u00ae\u00af\3\2\2\2\u00af\17\3\2\2"+
 		"\2\u00b0\u00ae\3\2\2\2\u00b1\u00b2\7\32\2\2\u00b2\u00b7\7&\2\2\u00b3\u00b4"+
-		"\7\5\2\2\u00b4\u00b6\7&\2\2\u00b5\u00b3\3\2\2\2\u00b6\u00b9\3\2\2\2\u00b7"+
+		"\7\7\2\2\u00b4\u00b6\7&\2\2\u00b5\u00b3\3\2\2\2\u00b6\u00b9\3\2\2\2\u00b7"+
 		"\u00b5\3\2\2\2\u00b7\u00b8\3\2\2\2\u00b8\u00ba\3\2\2\2\u00b9\u00b7\3\2"+
 		"\2\2\u00ba\u00bb\7\33\2\2\u00bb\21\3\2\2\2\u00bc\u00bd\7\34\2\2\u00bd"+
 		"\u00be\5\36\20\2\u00be\u00bf\7\35\2\2\u00bf\23\3\2\2\2\u00c0\u00c1\5\22"+
-		"\n\2\u00c1\u00c2\7\6\2\2\u00c2\u00c3\5\26\f\2\u00c3\u00c9\3\2\2\2\u00c4"+
-		"\u00c5\5\22\n\2\u00c5\u00c6\7\7\2\2\u00c6\u00c7\5\26\f\2\u00c7\u00c9\3"+
+		"\n\2\u00c1\u00c2\7\5\2\2\u00c2\u00c3\5\26\f\2\u00c3\u00c9\3\2\2\2\u00c4"+
+		"\u00c5\5\22\n\2\u00c5\u00c6\7\6\2\2\u00c6\u00c7\5\26\f\2\u00c7\u00c9\3"+
 		"\2\2\2\u00c8\u00c0\3\2\2\2\u00c8\u00c4\3\2\2\2\u00c9\25\3\2\2\2\u00ca"+
 		"\u00cb\b\f\1\2\u00cb\u00d7\5\32\16\2\u00cc\u00d7\7\36\2\2\u00cd\u00d7"+
 		"\7\37\2\2\u00ce\u00d7\7 \2\2\u00cf\u00d7\7!\2\2\u00d0\u00d1\7\"\2\2\u00d1"+
@@ -2394,8 +2394,8 @@ public class XQueryParser extends Parser {
 		"\7\4\2\2\u00d5\u00d7\3\2\2\2\u00d6\u00ca\3\2\2\2\u00d6\u00cc\3\2\2\2\u00d6"+
 		"\u00cd\3\2\2\2\u00d6\u00ce\3\2\2\2\u00d6\u00cf\3\2\2\2\u00d6\u00d0\3\2"+
 		"\2\2\u00d6\u00d2\3\2\2\2\u00d7\u00e8\3\2\2\2\u00d8\u00d9\f\6\2\2\u00d9"+
-		"\u00da\7\6\2\2\u00da\u00e7\5\26\f\7\u00db\u00dc\f\5\2\2\u00dc\u00dd\7"+
-		"\7\2\2\u00dd\u00e7\5\26\f\6\u00de\u00df\f\3\2\2\u00df\u00e0\7\5\2\2\u00e0"+
+		"\u00da\7\5\2\2\u00da\u00e7\5\26\f\7\u00db\u00dc\f\5\2\2\u00dc\u00dd\7"+
+		"\6\2\2\u00dd\u00e7\5\26\f\6\u00de\u00df\f\3\2\2\u00df\u00e0\7\7\2\2\u00e0"+
 		"\u00e7\5\26\f\4\u00e1\u00e2\f\4\2\2\u00e2\u00e3\7\32\2\2\u00e3\u00e4\5"+
 		"\30\r\2\u00e4\u00e5\7\33\2\2\u00e5\u00e7\3\2\2\2\u00e6\u00d8\3\2\2\2\u00e6"+
 		"\u00db\3\2\2\2\u00e6\u00de\3\2\2\2\u00e6\u00e1\3\2\2\2\u00e7\u00ea\3\2"+
