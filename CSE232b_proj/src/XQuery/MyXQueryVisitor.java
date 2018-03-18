@@ -99,33 +99,8 @@ public class MyXQueryVisitor extends XQueryBaseVisitor<ArrayList> {
                 continue;
             //returnClause
             this.curState = new ArrayList<Node>(prev);
-//            System.out.println("this is testing var");
-//            for(String str: this.curCtx.keySet()){
-//                System.out.println(str);
-//                for(Node n:this.curCtx.get(str)){
-//                    try{
-//                        OutputFormat format = OutputFormat.createPrettyPrint();
-//                        XMLWriter writer = new XMLWriter(System.out, format);
-//                        writer.write(n);
-//                    } catch (Exception e){
-//                        System.out.println("lalalalaa");
-//                    }
-//                }
-//            }
-//            System.out.println("this is testing var");
 
             ArrayList<Node> nnn = new ArrayList<>(this.visit(ctx.returnClause().xq()));
-//            System.out.println("Flwr output start");
-//            for(Node n: nnn){
-//                try{
-//                    OutputFormat format = OutputFormat.createPrettyPrint();
-//                    XMLWriter writer = new XMLWriter(System.out, format);
-//                    writer.write(n);
-//                } catch (Exception e){
-//                    System.out.println("lalalalaa");
-//                }
-//            }
-//            System.out.println("Flwr output end");
             returnList.addAll(nnn);
         }
         this.curCtx = this.stack.pop();
@@ -159,27 +134,24 @@ public class MyXQueryVisitor extends XQueryBaseVisitor<ArrayList> {
     public ArrayList visitSingleXQ(XQueryParser.SingleXQContext ctx) {
         ArrayList<Node> prev = new ArrayList<>(this.curState);
 
+
         ArrayList vv = this.visit(ctx.xq());
         this.curState = new ArrayList<>(vv);
+
         this.curState = this.visit(ctx.rp());
+
         LinkedHashSet<Node> tmp = new LinkedHashSet<Node>(this.curState);
         this.curState = new ArrayList<>(prev);
-//        System.out.println("SingleXQ output start");
-//        for(Node n:tmp) {
-//            try {
-//                OutputFormat format = OutputFormat.createPrettyPrint();
-//                XMLWriter writer = new XMLWriter(System.out, format);
-//                writer.write(n);
-//            } catch (Exception e) {
-//                System.out.println("lalalalaa");
-//            }
-//        }
-//        System.out.println("SingleXQ output end");
         return new ArrayList<Node>(tmp);
     }
 
     @Override
     public ArrayList visitCommaXQ(XQueryParser.CommaXQContext ctx) {
+//        this.curState = this.visit(ctx.xq(0));
+//        if (this.curState.isEmpty()){
+//            this.curState = this.visit(ctx.xq(1));
+//        }
+//        return this.curState;
         ArrayList<Node> prev = new ArrayList<Node>(this.curState);
 
         ArrayList<Node> first = this.visit(ctx.xq(0));
@@ -190,6 +162,7 @@ public class MyXQueryVisitor extends XQueryBaseVisitor<ArrayList> {
         total.addAll(first);
         total.addAll(second);
         this.curState = new ArrayList<Node>(prev);
+
         return total;
     }
 
@@ -202,6 +175,15 @@ public class MyXQueryVisitor extends XQueryBaseVisitor<ArrayList> {
     @Override
     public ArrayList visitBraceXQ(XQueryParser.BraceXQContext ctx) {
         ArrayList<Node> res = this.visit(ctx.xq());
+        for(Node n : res){
+            try {
+                OutputFormat format = OutputFormat.createPrettyPrint();
+                XMLWriter writer = new XMLWriter(System.out, format);
+                writer.write(n);
+            } catch (Exception e) {
+                System.out.println("lalalalaa");
+            }
+        }
         return res;
     }
 
@@ -228,8 +210,10 @@ public class MyXQueryVisitor extends XQueryBaseVisitor<ArrayList> {
                 //todo: what if two atts have the same name
                 if(s.selectNodes(att.concat("/*")).size() != 0)
                     leftNodes.add(s.selectNodes(att.concat("/*")).get(0));
-                else
+                else if(s.selectNodes(att.concat("/text()")).size() != 0)
                     leftNodes.add(s.selectNodes(att.concat("/text()")).get(0));
+                //else
+                //    leftNodes.add(DocumentHelper.createElement("new"));
             }
             ListKeys leftKeys = new ListKeys(leftNodes);
             if (joinHash.get(leftKeys) == null)
@@ -237,19 +221,40 @@ public class MyXQueryVisitor extends XQueryBaseVisitor<ArrayList> {
             joinHash.get(leftKeys).add(s);
         }
         // find key in hashmap and pair up to form a new tuple
+        NodeComparator v = new NodeComparator();
         for(Node s : large){
             ArrayList<Node> rightNodes = new ArrayList<>();
             for (String att : latt) {
                 //todo: what if two atts have the same name
+//                System.out.println("123");
+//                if(att.equals("spa")){
+//                    System.out.println(s.selectNodes(att).size());
+//                    try{
+//                        OutputFormat format = OutputFormat.createPrettyPrint();
+//                        XMLWriter writer = new XMLWriter(System.out, format);
+//                        writer.write(s.selectNodes(att).get(0));
+//                    } catch (Exception e){
+//                        System.out.println("lalalalaa");
+//                    }
+//                }
+//                System.out.println();
+//                System.out.println("att!!");
+//                System.out.println(s.selectNodes(att.concat("/*")).size());
+//                System.out.println(s.selectNodes(att.concat("/text()")).size());
+//                System.out.println(att);
+//                System.out.println();
                 if(s.selectNodes(att.concat("/*")).size() != 0)
                     rightNodes.add(s.selectNodes(att.concat("/*")).get(0));
-                else
+                else if(s.selectNodes(att.concat("/text()")).size() != 0)
                     rightNodes.add(s.selectNodes(att.concat("/text()")).get(0));
+                //else
+                //    rightNodes.add(DocumentHelper.createElement("new"));
             }
             ListKeys rightKeys = new ListKeys(rightNodes);
             if(!joinHash.containsKey(rightKeys))
                 continue;
-            for(Node node : joinHash.get(rightKeys)){
+
+            for(Node node : joinHash.get(rightKeys)) {
                 res.add(pairUp(node, s));
             }
         }
@@ -620,7 +625,10 @@ public class MyXQueryVisitor extends XQueryBaseVisitor<ArrayList> {
     public ArrayList visitChildrenRP(XQueryParser.ChildrenRPContext ctx) {
         ArrayList<Node> children_next = new ArrayList<>();
         for (Node n : this.curState){
-            children_next.addAll(n.selectNodes("*"));
+            if(n.selectNodes("*").size() != 0)
+                children_next.addAll(n.selectNodes("*"));
+            else if(n.selectNodes("text()").size() != 0)
+                children_next.addAll(n.selectNodes("text()"));
         }
         this.curState = children_next;
         return this.curState;
@@ -866,7 +874,7 @@ public class MyXQueryVisitor extends XQueryBaseVisitor<ArrayList> {
             // check if pattern is $a = "John"
             if (!var1.startsWith("$") || !var2.startsWith("$")) {
                 if (!var1.startsWith("$"))  stringMapping.put(var2, var1);
-                else stringMapping.put(var1, var2);
+                else    stringMapping.put(var1, var2);
                 continue;
             }
 
@@ -935,7 +943,8 @@ public class MyXQueryVisitor extends XQueryBaseVisitor<ArrayList> {
         rootPairList.addAll(rootPairSet);
 
         int index = 0;
-//        int size = mapping.size();
+        int size = mapping.size();
+//        for (ArrayList<String> rootPair: rootPairList)
         while (!rootPairList.isEmpty()) {
             boolean notPaired = false;
             ArrayList<String> rootPair = rootPairList.get(0);
@@ -956,6 +965,7 @@ public class MyXQueryVisitor extends XQueryBaseVisitor<ArrayList> {
                     output += printBlock(blocks.get(root2), varPaths, stringMapping) + ",";
                     output += "[" + String.join(",", varValues.get(0)) + "], ";
                     output += "[" + String.join(",", varValues.get(1)) + "])";
+
                 } else if (visited.contains(root2)){
                     output += printBlock(blocks.get(root1), varPaths, stringMapping) + ",";
                     output += "[" + String.join(",", varValues.get(1)) + "], ";
@@ -967,12 +977,18 @@ public class MyXQueryVisitor extends XQueryBaseVisitor<ArrayList> {
 //                    System.out.println("Not joining to the others!");
                 }
             }
+//            if (index < size - 1) {
+//                output += ",";
+//            }
             if (rootPairList.size() > 1 && notPaired == false) {
                 output += ",";
             }
 
-            visited.add(root1);
-            visited.add(root2);
+            if (notPaired == false) {
+                visited.add(root1);
+                visited.add(root2);
+            }
+
             index++;
             rootPairList.remove(0);
 
@@ -1097,7 +1113,7 @@ final class ListKeys{
         Iterator<Node> objKey;
         NodeComparator v = new NodeComparator();
         for(selfKey = this.listNodes.iterator(), objKey = ((ListKeys)obj).listNodes.iterator();
-                selfKey.hasNext();){
+            selfKey.hasNext();){
             if(v.compare(selfKey.next(),objKey.next()) != 0)
                 return false;
         }
